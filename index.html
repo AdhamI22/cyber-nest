@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cyber Nest | Adham Ismail</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--g:#39ff88;--bg:#080808;--s:#111;--w:#f5f5f0;--m:#999;--b:#292929}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--w);font-family:Arial,sans-serif;line-height:1.6}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit}
+button{cursor:pointer}
+#languageScreen{position:fixed;inset:0;z-index:9999;background:var(--bg);display:grid;place-items:center;text-align:center;padding:20px}
+.language-box{background:var(--s);border:1px solid #333;padding:40px 25px;width:min(450px,100%)}
+.language-box h1{font-size:32px;margin:15px 0}
+.language-box p{color:var(--m);margin-bottom:25px}
+.language-box button{display:block;width:100%;padding:15px;margin:12px 0;background:var(--g);border:1px solid var(--g);font-weight:bold}
+.language-box button:hover{background:transparent;color:var(--g)}
+.logo{font-weight:900;letter-spacing:2px;font-size:21px}
+.logo span{color:var(--g)}
+header{position:sticky;top:0;z-index:100;background:#080808ed;border-bottom:1px solid var(--b);padding:15px 7%;display:flex;justify-content:space-between;align-items:center;gap:15px}
+nav{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+nav a{font-size:13px;color:#ccc}
+nav a:hover{color:var(--g)}
+.lang-switch{background:none;color:var(--g);border:1px solid var(--g);padding:7px 12px}
+section{padding:90px 8%;border-top:1px solid var(--b)}
+.hero{min-height:85vh;display:grid;grid-template-columns:1.3fr .7fr;align-items:center;gap:55px;border:0}
+.tag,.section-label{color:var(--g);font-size:12px;letter-spacing:4px;margin-bottom:20px}
+.hero h1{font-size:clamp(48px,8vw,100px);line-height:.98;letter-spacing:-5px;margin-bottom:28px}
+.hero h1 span{color:var(--g)}
+.hero p,.about p,.contact-info p,.offer p{color:var(--m);font-size:17px;margin-bottom:28px}
+.hero p{max-width:550px}
+.photo-frame{position:relative;width:100%;max-width:390px}
+.hero-photo{width:100%;aspect-ratio:1;object-fit:cover;border:1px solid var(--g);background:#151515;display:block}
+.photo-frame:after{content:"";position:absolute;inset:15px -15px -15px 15px;border:1px solid var(--g);z-index:-1}
+.primary-btn{display:inline-block;background:var(--g);color:#080808;padding:14px 24px;font-weight:bold;border:1px solid var(--g)}
+.primary-btn:hover{background:transparent;color:var(--g)}
+.section-title{font-size:clamp(35px,6vw,65px);line-height:1.1;margin-bottom:45px;letter-spacing:-2px}
+.projects{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:35px}
+.project{text-align:center}
+.phone{width:100%;max-width:245px;margin:auto;padding:9px;border:3px solid #555;border-radius:30px;background:#151515;transition:.3s}
+.phone:hover{transform:translateY(-8px);border-color:var(--g)}
+.phone-screen{aspect-ratio:9/18;border-radius:19px;overflow:hidden;background:#222}
+.phone-screen img{width:100%;height:100%;object-fit:cover;display:block}
+.project h3{margin-top:20px;font-size:21px}
+.project p{color:var(--m);font-size:13px}
+.about p{max-width:800px}
+.about strong{color:var(--g)}
+.line{width:70px;height:3px;background:var(--g);margin-top:25px}
+.offer{background:var(--s);border:1px solid #333;padding:40px;max-width:850px}
+.offer h3{font-size:30px;margin-bottom:15px}
+.offer h3 span{color:var(--g)}
+.contact-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:55px}
+.whatsapp-link{display:inline-block;color:var(--g);border-bottom:1px solid var(--g);padding-bottom:5px}
+.contact-form{background:var(--s);border:1px solid var(--b);padding:30px}
+.form-step{display:none}
+.form-step.active{display:block}
+.form-step h3{font-size:24px;margin-bottom:25px}
+.field{margin-bottom:20px}
+.field label{display:block;color:#ccc;font-size:13px;margin-bottom:8px}
+.field input{width:100%;padding:13px;background:var(--bg);border:1px solid #333;color:white;outline:none}
+.field input:focus{border-color:var(--g)}
+.choice-group{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.choice{display:flex;gap:8px;align-items:center;border:1px solid #333;padding:11px;font-size:13px;color:#ccc}
+.choice:has(input:checked){border-color:var(--g);color:var(--g)}
+.choice input{accent-color:var(--g);width:auto}
+.form-buttons{display:flex;gap:10px;margin-top:25px}
+.form-btn{padding:12px 18px;background:var(--g);border:1px solid var(--g);font-weight:bold}
+.form-btn.secondary{background:transparent;color:var(--g)}
+.form-message{color:var(--g);margin-top:15px;font-size:14px}
+footer{padding:30px 8%;border-top:1px solid var(--b);display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;color:#777;font-size:13px}
+footer strong{color:var(--g)}
+.reveal{opacity:0;transform:translateY(20px);transition:.7s}
+.reveal.visible{opacity:1;transform:none}
+body.ar{direction:rtl;text-align:right;font-family:Arial,Tahoma,sans-serif}
+body.ar .hero h1{letter-spacing:0}
+body.ar .tag,body.ar .section-label{letter-spacing:1px}
+body.ar .photo-frame:after{inset:15px 15px -15px -15px}
+body.ar footer{direction:rtl}
+@media(max-width:850px){header{padding:15px 5%;flex-wrap:wrap}nav{gap:12px}.hero{grid-template-columns:1fr;padding:70px 7%}.hero-photo{max-width:320px}.projects,.contact-grid{grid-template-columns:1fr}.projects{gap:50px}}
+@media(max-width:500px){section{padding:70px 6%}.hero h1{letter-spacing:-3px}.choice-group{grid-template-columns:1fr}.contact-form,.offer{padding:20px}nav a{font-size:11px}}
+</style>
+</head>
+<body>
+
+<div id="languageScreen">
+ <div class="language-box">
+  <div class="logo">CYBER <span>NEST.</span></div>
+  <h1>Choose Your Language</h1><p>اختر لغتك المفضلة</p>
+  <button onclick="enterWebsite('en')">English</button>
+  <button onclick="enterWebsite('ar')">العربية</button>
+ </div>
+</div>
+
+<header>
+ <a href="#" class="logo">CYBER <span>NEST.</span></a>
+ <nav>
+  <a href="#home" data-en="Home" data-ar="الرئيسية">Home</a>
+  <a href="#projects" data-en="Projects" data-ar="المشاريع">Projects</a>
+  <a href="#about" data-en="About" data-ar="من أنا">About</a>
+  <a href="#contact" data-en="Contact" data-ar="تواصل معي">Contact</a>
+  <button class="lang-switch" id="headerLang" onclick="switchLanguage()">العربية</button>
+ </nav>
+</header>
+
+<main>
+
+<section class="hero" id="home">
+ <div class="reveal">
+  <div class="tag" data-en="WEB DEVELOPER / CYBER NEST" data-ar="مطور مواقع / سايبر نيست">WEB DEVELOPER / CYBER NEST</div>
+  <h1><span data-en="BUILDING" data-ar="نصمم">BUILDING</span><br><span data-en="DIGITAL" data-ar="تجارب">DIGITAL</span><br><span data-en="EXPERIENCES." data-ar="رقمية.">EXPERIENCES.</span></h1>
+  <p data-en="I create modern, professional websites designed to help businesses build their online presence." data-ar="أقوم بتصميم مواقع إلكترونية حديثة واحترافية تساعد الشركات والمشاريع على بناء وجودها على الإنترنت.">I create modern, professional websites designed to help businesses build their online presence.</p>
+  <a href="#contact" class="primary-btn" data-en="START A PROJECT ↗" data-ar="ابدأ مشروعك ↗">START A PROJECT ↗</a>
+ </div>
+ <div class="photo-frame reveal">
+  <img class="hero-photo" src="l1.jpg" alt="Adham Ismail">
+ </div>
+</section>
+
+
+<section id="projects">
+ <div class="section-label" data-en="SELECTED WORK" data-ar="أعمال مختارة">SELECTED WORK</div>
+ <h2 class="section-title" data-en="Featured Projects." data-ar="أبرز المشاريع.">Featured Projects.</h2>
+ <div class="projects">
+  <div class="project reveal">
+   <div class="phone"><div class="phone-screen"><img src="w1.png.jpeg" alt="Taskora screenshot"></div></div>
+   <h3>Taskora</h3><p data-en="Smart task management website" data-ar="موقع ذكي لتنظيم المهام">Smart task management website</p>
+  </div>
+  <div class="project reveal">
+   <div class="phone"><div class="phone-screen"><img src="bdd.jpeg" alt="bdd.jpeg"></div></div>
+   <h3>Azab Academy</h3><p data-en="Sports academy website" data-ar="موقع أكاديمية رياضية">Sports academy website</p>
+  </div>
+  <div class="project reveal">
+   <div class="phone"><div class="phone-screen"><img src="w.png.jpeg" alt="Aula Gaming Store screenshot"></div></div>
+   <h3>Aula Gaming Store</h3><p data-en="Gaming e-commerce website" data-ar="متجر إلكتروني لمنتجات الجيمنج">Gaming e-commerce website</p>
+  </div>
+ </div>
+</section>
+
+<section id="about">
+ <div class="section-label" data-en="WHO I AM" data-ar="من أنا">WHO I AM</div>
+ <h2 class="section-title" data-en="About Me." data-ar="نبذة عني.">About Me.</h2>
+ <div class="about reveal"><p data-en="My name is Adham Ismail. I am a 15-year-old web developer interested in creating modern, functional and professional websites. Through Cyber Nest, I work on turning ideas into useful digital experiences for businesses and individuals." data-ar="اسمي أدهم إسماعيل، عمري 15 عاماً، ومطور مواقع مهتم بإنشاء مواقع حديثة وعملية واحترافية. من خلال Cyber Nest أعمل على تحويل الأفكار إلى تجارب رقمية مفيدة للشركات والأفراد.">My name is Adham Ismail. I am a 15-year-old web developer interested in creating modern, functional and professional websites. Through Cyber Nest, I work on turning ideas into useful digital experiences for businesses and individuals.</p><div class="line"></div></div>
+</section>
+
+<section>
+ <div class="section-label" data-en="MY OFFER" data-ar="عرضي">MY OFFER</div>
+ <div class="offer reveal">
+  <h3 data-en="A website you can <span>see first.</span>" data-ar="شاهد موقعك <span>أولاً.</span>">A website you can <span>see first.</span></h3>
+  <p data-en="If you like the completed website, you can choose to buy it. If you don't like it, you can walk away without paying. We'll agree on the project scope and terms before work begins." data-ar="إذا أعجبك الموقع بعد الانتهاء منه، يمكنك اختيار شرائه. وإذا لم يعجبك، يمكنك عدم شرائه دون دفع أي مبلغ. سنتفق على تفاصيل المشروع وشروطه قبل بدء العمل.">If you like the completed website, you can choose to buy it. If you don't like it, you can walk away without paying. We'll agree on the project scope and terms before work begins.</p>
+  <a href="#contact" class="primary-btn" data-en="LET'S TALK ↗" data-ar="لنتحدث عن مشروعك ↗">LET'S TALK ↗</a>
+ </div>
+</section>
+
+<section id="contact">
+ <div class="section-label" data-en="GET IN TOUCH" data-ar="تواصل معي">GET IN TOUCH</div>
+ <h2 class="section-title" data-en="Let's Work Together." data-ar="لنعمل معاً.">Let's Work Together.</h2>
+ <div class="contact-grid">
+  <div class="contact-info reveal">
+   <p data-en="Have a project in mind? Tell me about your business and what you need." data-ar="لديك مشروع في ذهنك؟ أخبرني عن نشاطك التجاري وما تحتاج إليه.">Have a project in mind? Tell me about your business and what you need.</p>
+   <a class="whatsapp-link" href="https://wa.me/201033449928" target="_blank" rel="noopener">
+    <span data-en="Click here for contact via WhatsApp" data-ar="اضغط هنا للتواصل عبر واتساب">Click here for contact via WhatsApp</span><br>WhatsApp: 01033449928 ↗
+   </a>
+  </div>
+
+  <form class="contact-form reveal" id="contactForm">
+   <div class="form-step active" id="step1">
+    <h3 data-en="01 / Your Details" data-ar="01 / بياناتك">01 / Your Details</h3>
+    <div class="field"><label data-en="Full Name" data-ar="الاسم بالكامل">Full Name</label><input id="fullName" maxlength="100" required placeholder="Enter your full name"></div>
+    <div class="field"><label data-en="Phone Number" data-ar="رقم الهاتف">Phone Number</label><input id="phone" type="tel" maxlength="30" required placeholder="Enter your phone number"></div>
+    <div class="form-buttons"><button type="button" class="form-btn" onclick="nextStep()" data-en="CONTINUE →" data-ar="متابعة ←">CONTINUE →</button></div>
+   </div>
+
+   <div class="form-step" id="step2">
+    <h3 data-en="02 / Your Project" data-ar="02 / مشروعك">02 / Your Project</h3>
+    <div class="field"><label data-en="Business Name" data-ar="اسم النشاط التجاري">Business Name</label><input id="businessName" maxlength="120" required placeholder="Your business name"></div>
+
+    <div class="field"><label data-en="Business Type" data-ar="نوع النشاط">Business Type</label><div class="choice-group">
+     <label class="choice"><input type="radio" name="businessType" value="Retail / Store" required>Retail / Store</label>
+     <label class="choice"><input type="radio" name="businessType" value="Restaurant / Cafe">Restaurant / Cafe</label>
+     <label class="choice"><input type="radio" name="businessType" value="Sports / Academy">Sports / Academy</label>
+     <label class="choice"><input type="radio" name="businessType" value="Services">Services</label>
+     <label class="choice"><input type="radio" name="businessType" value="Personal brand">Personal brand</label>
+     <label class="choice"><input type="radio" name="businessType" value="Other">Other</label>
+    </div></div>
+
+    <div class="field"><label data-en="Your Budget" data-ar="ميزانيتك">Your Budget</label><div class="choice-group">
+     <label class="choice"><input type="radio" name="budget" value="200-600 EGP" required>200–600 EGP</label>
+     <label class="choice"><input type="radio" name="budget" value="600-1000 EGP">600–1000 EGP</label>
+    </div></div>
+
+    <div class="field"><label data-en="Average Customers" data-ar="متوسط عدد العملاء">Average Customers</label><div class="choice-group">
+     <label class="choice"><input type="radio" name="customers" value="10-50" required>10–50</label>
+     <label class="choice"><input type="radio" name="customers" value="50-100">50–100</label>
+     <label class="choice"><input type="radio" name="customers" value="100-300">100–300</label>
+     <label class="choice"><input type="radio" name="customers" value="500+">500+</label>
+    </div></div>
+
+    <div class="form-buttons">
+     <button type="button" class="form-btn secondary" onclick="previousStep()" data-en="← BACK" data-ar="رجوع ←">← BACK</button>
+     <button type="submit" class="form-btn" data-en="SUBMIT PROJECT ↗" data-ar="إرسال المشروع ↗">SUBMIT PROJECT ↗</button>
+    </div>
+   </div>
+   <p class="form-message" id="formMessage"></p>
+  </form>
+ </div>
+</section>
+</main>
+
+<footer>
+ <div>© 2026 CYBER NEST. <span data-en="ALL RIGHTS RESERVED." data-ar="جميع الحقوق محفوظة.">ALL RIGHTS RESERVED.</span></div>
+ <strong>Developed By Adham Ismail (cyber nest)</strong>
+</footer>
+
+<script>
+/* ADD YOUR SUPABASE PROJECT DETAILS HERE */
+const SUPABASE_URL = "https://sebcqheduptamelijgdc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_ASwWs3cXITW0nuI28b9hKA_Rhb5hy5g";
+const db=SUPABASE_URL.startsWith("https://")&&SUPABASE_KEY!=="YOUR_SUPABASE_ANON_OR_PUBLISHABLE_KEY"?supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
+
+let currentLanguage="en";
+function setLanguage(l){
+ currentLanguage=l;document.documentElement.lang=l;document.body.classList.toggle("ar",l==="ar");
+ document.querySelectorAll("[data-en][data-ar]").forEach(e=>e.innerHTML=e.dataset[l]);
+ document.getElementById("headerLang").textContent=l==="en"?"العربية":"English";
+}
+function enterWebsite(l){setLanguage(l);document.getElementById("languageScreen").style.display="none"}
+function switchLanguage(){setLanguage(currentLanguage==="en"?"ar":"en")}
+function nextStep(){
+ if(!document.getElementById("fullName").reportValidity()||!document.getElementById("phone").reportValidity())return;
+ step1.classList.remove("active");step2.classList.add("active");
+}
+function previousStep(){step2.classList.remove("active");step1.classList.add("active")}
+
+document.getElementById("contactForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const f=e.target,m=document.getElementById("formMessage"),btn=f.querySelector('[type=submit]');
+ const type=f.querySelector('[name=businessType]:checked'),budget=f.querySelector('[name=budget]:checked'),customers=f.querySelector('[name=customers]:checked');
+ if(!type||!budget||!customers){m.textContent="Please complete all project choices.";return}
+ if(!db){m.textContent="Form not connected yet. Please contact us on WhatsApp.";return}
+ btn.disabled=true;btn.textContent="SENDING...";
+ try{
+  const {error}=await db.from("project_enquiries").insert([{
+   full_name:fullName.value.trim(),phone:phone.value.trim(),business_name:businessName.value.trim(),
+   business_type:type.value,budget:budget.value,average_customers:customers.value
+  }]);
+  if(error)throw error;
+  m.textContent=currentLanguage==="en"?"Your project details have been submitted successfully!":"تم إرسال تفاصيل مشروعك بنجاح!";
+  f.reset();step2.classList.remove("active");step1.classList.add("active");
+ }catch(err){console.error(err);m.textContent=currentLanguage==="en"?"Something went wrong. Please try again or contact us on WhatsApp.":"حدث خطأ. حاول مرة أخرى أو تواصل عبر واتساب."}
+ finally{btn.disabled=false;btn.textContent=currentLanguage==="en"?"SUBMIT PROJECT ↗":"إرسال المشروع ↗"}
+});
+
+const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("visible");observer.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll(".reveal").forEach(e=>observer.observe(e));
+</script>
+</body>
+</html>
+
